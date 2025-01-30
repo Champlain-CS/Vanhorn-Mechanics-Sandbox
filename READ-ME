@@ -1,2 +1,202 @@
-Yo this is the project bruh
-Hello World
+package com.example.mechanicSim;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StackingShapesSim extends Application {
+
+    private static final double GRAVITY = 5.0;
+    private static final double GROUND_LEVEL = 500;
+    private static final double RECTANGLE_WIDTH = 100;
+    private static final double RECTANGLE_HEIGHT = 50;
+    private static final double CIRCLE_RADIUS = 25;
+
+    private List<javafx.scene.shape.Shape> shapes = new ArrayList<>();
+
+    @Override
+    public void start(Stage primaryStage) {
+        Pane mainPane = new Pane();
+        mainPane.setPrefSize(600, 500);
+
+        // Bottom bar for shape buttons
+        HBox bottomBar = new HBox();
+        bottomBar.setPrefHeight(50);
+        bottomBar.setStyle("-fx-background-color: lightgray;");
+        bottomBar.setSpacing(10);
+
+        // Create buttons for each shape
+        Rectangle rectangleButton = createButtonRectangle(100, 30, Color.WHITE);
+        Circle circleButton = createButtonCircle(15, Color.GRAY);
+
+        // Add click handlers for each button
+        rectangleButton.setOnMouseClicked(event -> {
+            Rectangle newRectangle = createDraggableRectangle(200, 0, RECTANGLE_WIDTH, RECTANGLE_HEIGHT, Color.BLUE);
+            mainPane.getChildren().add(newRectangle);
+            shapes.add(newRectangle);
+        });
+
+        circleButton.setOnMouseClicked(event -> {
+            Circle newCircle = createDraggableCircle(200, 0, CIRCLE_RADIUS, Color.RED);
+            mainPane.getChildren().add(newCircle);
+            shapes.add(newCircle);
+        });
+
+        // Add buttons to the bottom bar
+        bottomBar.getChildren().addAll(rectangleButton, circleButton);
+
+        // Root layout with main pane and bottom bar
+        VBox root = new VBox(mainPane, bottomBar);
+
+        // Create a scene
+        Scene scene = new Scene(root, 600, 550);
+
+        // Animation timer to simulate gravity and stacking
+        AnimationTimer gravityTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                for (javafx.scene.shape.Shape shape : shapes) {
+                    if (isAtRest(shape)) {
+                        continue;
+                    }
+
+                    double newY = getShapeY(shape) + GRAVITY;
+
+                    // Check for collisions with other shapes
+                    for (javafx.scene.shape.Shape other : shapes) {
+                        if (shape != other && isColliding(shape, other)) {
+                            newY = getShapeY(other) - getShapeHeight(shape);
+                            break;
+                        }
+                    }
+
+                    // Check for ground collision
+                    if (newY + getShapeHeight(shape) >= GROUND_LEVEL) {
+                        newY = GROUND_LEVEL - getShapeHeight(shape);
+                    }
+
+                    setShapeY(shape, newY);
+                }
+            }
+        };
+
+        gravityTimer.start();
+
+        // Set up the stage
+        primaryStage.setTitle("Stacking Shapes Simulator");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private boolean isAtRest(javafx.scene.shape.Shape shape) {
+        if (getShapeY(shape) + getShapeHeight(shape) >= GROUND_LEVEL) {
+            return true;
+        }
+
+        for (javafx.scene.shape.Shape other : shapes) {
+            if (shape != other && isColliding(shape, other)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isColliding(javafx.scene.shape.Shape shape, javafx.scene.shape.Shape other) {
+        double shapeBottom = getShapeY(shape) + getShapeHeight(shape);
+        double otherTop = getShapeY(other);
+        double shapeLeft = getShapeX(shape);
+        double shapeRight = shapeLeft + getShapeWidth(shape);
+        double otherLeft = getShapeX(other);
+        double otherRight = otherLeft + getShapeWidth(other);
+
+        return shapeBottom >= otherTop &&
+                shapeLeft < otherRight &&
+                shapeRight > otherLeft;
+    }
+
+    private double getShapeY(javafx.scene.shape.Shape shape) {
+        if (shape instanceof Rectangle) {
+            return ((Rectangle) shape).getY();
+        } else if (shape instanceof Circle) {
+            return ((Circle) shape).getCenterY() - ((Circle) shape).getRadius();
+        }
+        return 0;
+    }
+
+    private double getShapeX(javafx.scene.shape.Shape shape) {
+        if (shape instanceof Rectangle) {
+            return ((Rectangle) shape).getX();
+        } else if (shape instanceof Circle) {
+            return ((Circle) shape).getCenterX() - ((Circle) shape).getRadius();
+        }
+        return 0;
+    }
+
+    private double getShapeWidth(javafx.scene.shape.Shape shape) {
+        if (shape instanceof Rectangle) {
+            return ((Rectangle) shape).getWidth();
+        } else if (shape instanceof Circle) {
+            return ((Circle) shape).getRadius() * 2;
+        }
+        return 0;
+    }
+
+    private double getShapeHeight(javafx.scene.shape.Shape shape) {
+        if (shape instanceof Rectangle) {
+            return ((Rectangle) shape).getHeight();
+        } else if (shape instanceof Circle) {
+            return ((Circle) shape).getRadius() * 2;
+        }
+        return 0;
+    }
+
+    private void setShapeY(javafx.scene.shape.Shape shape, double y) {
+        if (shape instanceof Rectangle) {
+            ((Rectangle) shape).setY(y);
+        } else if (shape instanceof Circle) {
+            ((Circle) shape).setCenterY(y + ((Circle) shape).getRadius());
+        }
+    }
+
+    private Rectangle createDraggableRectangle(double x, double y, double width, double height, Color color) {
+        Rectangle rectangle = new Rectangle(x, y, width, height);
+        rectangle.setFill(color);
+        rectangle.setStroke(Color.BLACK);
+        return rectangle;
+    }
+
+    private Circle createDraggableCircle(double x, double y, double radius, Color color) {
+        Circle circle = new Circle(x, y + radius, radius, color);
+        circle.setStroke(Color.BLACK);
+        return circle;
+    }
+
+    private Rectangle createButtonRectangle(double width, double height, Color color) {
+        Rectangle rect = new Rectangle(width, height, color);
+        rect.setStroke(Color.BLACK);
+        return rect;
+    }
+
+    private Circle createButtonCircle(double radius, Color color) {
+        Circle circle = new Circle(radius, color);
+        circle.setStroke(Color.BLACK);
+        return circle;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}

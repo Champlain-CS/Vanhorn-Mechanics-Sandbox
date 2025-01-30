@@ -1,6 +1,8 @@
 package com.example.mechanicSim;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -10,9 +12,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 
 public class DraggableShapesApp extends Application {
+
+    private static final double GRAVITY = 9.8; // Gravity acceleration
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -52,6 +58,25 @@ public class DraggableShapesApp extends Application {
 
         // Root layout with main pane and bottom bar
         VBox root = new VBox(mainPane, bottomBar);
+
+        // Animation timer to simulate gravity and collisions
+        AnimationTimer gravityTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                for (Node shape : mainPane.getChildren()) {
+                    if (shape.getClass().equals(Rectangle.class)) {
+                        Rectangle rectangle = (Rectangle) shape;
+                        rectangle.setY(rectangle.getY() + 3); // Move rectangle down
+                    } else if (shape.getClass().equals(Circle.class)) {
+                        Circle circle = (Circle) shape;
+                        circle.setCenterY(circle.getCenterY() + 3); // Move circle down
+                    }
+                }
+            }
+        };
+        gravityTimer.start();
+
+        // Enable dragging and removal for shapes
 
         // Set up the stage
         Scene scene = new Scene(root, 600, 400);
@@ -165,6 +190,8 @@ public class DraggableShapesApp extends Application {
         line.setStrokeWidth(strokeWidth);
         return line;
     }
+
+
 
     public static void main(String[] args) {
         launch(args);
