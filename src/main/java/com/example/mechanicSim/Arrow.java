@@ -13,7 +13,7 @@ public class Arrow extends Pane {
     private final Polygon arrowhead;
     private final Rotate rotate;
     private double length;
-    private Text forceName;
+    private final Text forceName;
     private double endX, endY;
 
 
