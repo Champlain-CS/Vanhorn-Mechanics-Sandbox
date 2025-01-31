@@ -4,6 +4,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
 public class Arrow extends Pane {
@@ -11,8 +13,11 @@ public class Arrow extends Pane {
     private final Polygon arrowhead;
     private final Rotate rotate;
     private double length;
+    private Text forceName;
+    private double endX, endY;
 
-    public Arrow(double startX, double startY, double length, double angle) {
+
+    public Arrow(double startX, double startY, double length, double angle, String name) {
         this.length = length;
 
         // Line for arrow shaft
@@ -26,18 +31,25 @@ public class Arrow extends Pane {
         arrowhead.setScaleY(2);
         updateArrowhead();
 
+
+        //Force Name (Text)
+        forceName = new Text(name);
+        forceName.setFill(Color.BLACK);
+        forceName.setFont(new Font(20));
+        updateName();
+
+
         // Rotation transform (around the start of the arrow)
         rotate = new Rotate(angle, startX, startY);
         this.getTransforms().add(rotate);
 
-        // Add shapes to the pane
-        getChildren().addAll(line, arrowhead);
+        getChildren().addAll(line, arrowhead, forceName);
     }
 
     private void updateArrowhead() {
         //Adding a little offset to the endX to remove clipping of the shaft in the arrow head
-        double endX = line.getEndX()+arrowhead.getScaleX();
-        double endY = line.getEndY();
+        endX = line.getEndX()+ 2;
+        endY = line.getEndY();
         double arrowSize = 10;
 
         arrowhead.getPoints().setAll(
@@ -45,17 +57,26 @@ public class Arrow extends Pane {
                 endX - arrowSize, endY - arrowSize / 2,
                 endX - arrowSize, endY + arrowSize / 2
         );
-        arrowhead.setFill(Color.BLACK);
+    }
+
+    private void updateName() {
+        forceName.setX(endX+5);
+        forceName.setY(endY-10);
+        if (rotate != null) {
+            forceName.setRotate(0-rotate.getAngle());
+        }
     }
 
     public void setLength(double newLength) {
         length = newLength;
         line.setEndX(line.getStartX() + newLength);
         updateArrowhead();
+        updateName();
     }
 
     public void setRotation(double angle) {
         rotate.setAngle(angle);
+        updateName();
     }
 
     public double getLength() {

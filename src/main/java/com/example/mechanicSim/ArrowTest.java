@@ -13,7 +13,7 @@ public class ArrowTest extends Application {
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
         Pane pane = new Pane();
-        Arrow arrow = new Arrow(100, 100, 100, 0);
+        Arrow arrow = new Arrow(100, 100, 100, 0, "F");
         pane.getChildren().add(arrow);
 
 
