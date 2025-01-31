@@ -10,8 +10,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
          ui = new UserInterface(
                 primaryStage,
-                600,
-                400,
+                1280,
+                720,
                 "Draggable Shapes with Creation and Removal"
         );
 

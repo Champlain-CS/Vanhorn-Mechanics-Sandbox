@@ -1,27 +1,54 @@
 package com.example.mechanicSim;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Node;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 
 public class Physics {
-    public static final double GRAV_ACC_ON_EARTH_AT_SEA_LEVEL = 9.8;
-    private static ArrayList<PhysicsObject> PHYSICS_OBJECTS = new ArrayList<>();
+    // Physical constants
+    public static final double GRAV_ACC = 9.8;
 
+    // Physics objects present in the scene
+    private static final ArrayList<PhysicsObject> PHYSICS_OBJECTS = new ArrayList<>();
+
+    static AnimationTimer gravityTimer;
+
+    /* TODO:
+       Transform pixel coordinates to world space coordinates so that we can change the scale of the scene.
+       Right now, one pixel represents one meter, so we're REALLY zoomed out and so everything looks
+       like it's moving super slowly. In reality, things are moving at the desired speed, it's just as
+       if we're looking at very large objects falling hundreds of meters from the sky from very far away.
+       We need linear algebra for this.
+     */
     public static void update() {
-        // Animation timer to simulate gravity and collisions
-        AnimationTimer gravityTimer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                for (PhysicsObject object : PHYSICS_OBJECTS) {
-                    object.setPositionX(object.getPositionX() + GRAV_ACC_ON_EARTH_AT_SEA_LEVEL);
+        Timeline updateLoop = new Timeline();
+        updateLoop.setCycleCount(Timeline.INDEFINITE);
+
+        // Using an array here so that we can update the value within the lambda function.
+        final long[] currentTime = {System.currentTimeMillis()}; // Start time
+
+        KeyFrame frame = new KeyFrame(
+                Duration.seconds(0.001), // Enter the desired frame time here (0.016 for 60FPS)
+                event -> {
+                    long newTime = System.currentTimeMillis();
+                    long elapsedTime = newTime - currentTime[0];
+                    currentTime[0] = newTime;
+
+                    // Update all physics objects
+                    for (PhysicsObject object : PHYSICS_OBJECTS) {
+                        if(!object.isAnchored()) {
+                            object.updateVelocity(elapsedTime);
+                            object.updatePosition(elapsedTime);
+                        }
+                    }
                 }
-            }
-        };
-        gravityTimer.start();
+        );
+
+        updateLoop.getKeyFrames().add(frame);
+        updateLoop.play();
     }
 
     public static void addPhysicsObject(PhysicsObject physicsObject) {

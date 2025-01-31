@@ -6,7 +6,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -16,7 +15,6 @@ public class UserInterface {
 
     private Rectangle rectangleButton;
     private Circle circleButton;
-    private Line lineButton;
 
     // "Draggable Shapes with Creation and Removal"
     UserInterface(Stage primaryStage, int windowWidth, int windowHeight, String windowTitle) {
@@ -40,7 +38,6 @@ public class UserInterface {
     private void setupToolBar() {
         rectangleButton = createButtonRectangle(100, 30, Color.WHITE);
         circleButton = createButtonCircle(15, Color.GRAY);
-        lineButton = createButtonLine(50, 5, Color.BLACK);
 
         // Bottom bar for shape buttons
         BOTTOM_BAR.setPrefHeight(50);
@@ -48,7 +45,7 @@ public class UserInterface {
         BOTTOM_BAR.setSpacing(10);
 
         // Add buttons to the bottom bar
-        BOTTOM_BAR.getChildren().addAll(rectangleButton, circleButton, lineButton);
+        BOTTOM_BAR.getChildren().addAll(rectangleButton, circleButton);
     }
 
     /* --- Helper methods --- */
@@ -67,14 +64,6 @@ public class UserInterface {
         return circle;
     }
 
-    // Helper method to create a line button
-    private Line createButtonLine(double length, double strokeWidth, Color color) {
-        Line line = new Line(0, 0, length, 0);
-        line.setStroke(color);
-        line.setStrokeWidth(strokeWidth);
-        return line;
-    }
-
     /* --- Getters and Setters --- */
     public Pane getMainPane() {
         return MAIN_PANE;
@@ -86,9 +75,5 @@ public class UserInterface {
 
     public Circle getCircleButton() {
         return circleButton;
-    }
-
-    public Line getLineButton() {
-        return lineButton;
     }
 }
