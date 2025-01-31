@@ -15,18 +15,22 @@ public class Arrow extends Pane {
     private double length;
     private final Text forceName;
     private double endX, endY;
+    private Color color;
 
 
-    public Arrow(double startX, double startY, double length, double angle, String name) {
+    public Arrow(double startX, double startY, double length, double angle, String name, Color color) {
         this.length = length;
+        this.color = color;
 
         // Line for arrow shaft
         line = new Line(startX, startY, startX + length, startY);
-        line.setStroke(Color.BLACK);
+        line.setStroke(color);
         line.setStrokeWidth(5);
 
         // Arrow head (Triangle)
         arrowhead = new Polygon();
+        arrowhead.setFill(color);
+        arrowhead.setStroke(color);
         arrowhead.setScaleX(2);
         arrowhead.setScaleY(2);
         updateArrowhead();
@@ -34,7 +38,7 @@ public class Arrow extends Pane {
 
         //Force Name (Text)
         forceName = new Text(name);
-        forceName.setFill(Color.BLACK);
+        forceName.setFill(color);
         forceName.setFont(new Font(20));
         updateName();
 

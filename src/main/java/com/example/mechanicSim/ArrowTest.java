@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ArrowTest extends Application {
@@ -13,7 +14,7 @@ public class ArrowTest extends Application {
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
         Pane pane = new Pane();
-        Arrow arrow = new Arrow(100, 100, 100, 0, "F");
+        Arrow arrow = new Arrow(100, 100, 100, 0, "F", Color.GREEN);
         pane.getChildren().add(arrow);
 
 
